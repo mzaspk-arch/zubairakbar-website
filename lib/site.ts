@@ -6,7 +6,7 @@
 export const SITE = {
   url: (process.env.NEXT_PUBLIC_SITE_URL || 'https://zubairakbar.com').replace(/\/$/, ''),
   name: 'Zubair Akbar',
-  title: 'Zubair Akbar | UAE Tax, Finance & SaaS Solutions',
+  title: 'Zubair Akbar | Finance, Tax & Technology Entrepreneur',
   description:
     'Chartered Accountant, Group CFO and FTA-approved Tax Agent (TAAN 20059440) building SaaS. UAE & Pakistan tax, ERP and AI automation insights.',
   tagline: 'Building Businesses. Empowering Finance. Creating Technology.',
