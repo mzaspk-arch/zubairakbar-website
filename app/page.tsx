@@ -69,8 +69,8 @@ export default function HomePage() {
           </div>
           <div className="hero__media">
             <img src="/images/zubair-akbar-portrait.webp" alt="Zubair Akbar in a navy suit" width={540} height={675} fetchPriority="high" />
-            <div className="float-card" style={{ left: 0, top: '28%' }}><strong>16+</strong><span>years in audit, tax &amp; finance</span></div>
-            <div className="float-card" style={{ right: 0, bottom: '18%' }}><strong>12</strong><span>SaaS products in the portfolio</span></div>
+            <div className="float-card float-card--a"><strong>16+</strong><span>years in audit, tax &amp; finance</span></div>
+            <div className="float-card float-card--b"><strong>12</strong><span>SaaS products in the portfolio</span></div>
           </div>
         </div>
         <div className="follow-bar">
