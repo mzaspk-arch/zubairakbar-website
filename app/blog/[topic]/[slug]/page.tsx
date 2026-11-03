@@ -30,7 +30,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ topic:
   const url = absoluteUrl(path);
   const toc = post.headings.filter((h) => h.id !== 'key-takeaways');
   if (post.faq.length) toc.push({ id: 'faq', text: 'FAQ' });
-  const related = getAllPosts().filter((p) => p.slug !== post.slug).slice(0, 3);
+  const others = getAllPosts().filter((p) => p.slug !== post.slug);
+  const related = [...others.filter((p) => p.topic === post.topic), ...others.filter((p) => p.topic !== post.topic)].slice(0, 3);
   const isTax = post.topic === 'uae-tax' || post.topic === 'pakistan-tax';
 
   const share = [
