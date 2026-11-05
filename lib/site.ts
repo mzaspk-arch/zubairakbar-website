@@ -35,6 +35,7 @@ export const SOCIAL = [
   { key: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/zubairakbarpk' },
   { key: 'x', label: 'X', href: 'https://x.com/zubairakbarpk' },
   { key: 'youtube', label: 'YouTube', href: 'https://www.youtube.com/@zubairakbarpk' },
+  { key: 'tiktok', label: 'TikTok', href: 'https://www.tiktok.com/@zubairakbarpk' },
 ] as const;
 
 export type SocialKey = (typeof SOCIAL)[number]['key'];

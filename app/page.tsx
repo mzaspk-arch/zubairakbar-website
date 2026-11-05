@@ -32,7 +32,7 @@ const FAQ: QA[] = [
   { q: 'Can you help with UAE Corporate Tax, VAT and Excise?', a: 'Yes. As an FTA-approved Tax Agent I advise on registration, filing and compliance for Corporate Tax, VAT and Excise, through Accentureon Consulting and Xpert Group.' },
   { q: 'Do you work with businesses in Pakistan?', a: 'Yes. Xpert Group Pakistan supports Pakistani businesses and overseas Pakistanis with taxation, software and digital services.' },
   { q: 'Which SaaS products have you built?', a: 'Live products include Whatsell.ai, HireSyncer and FormSyncer, with SignSyncer, EduSyncer, EduNestra and six more on the way.' },
-  { q: 'How can I contact you?', a: `Email ${SITE.email} or use the contact form. You can also follow ${SITE.handle} on LinkedIn, Facebook, Instagram, X and YouTube.` },
+  { q: 'How can I contact you?', a: `Email ${SITE.email} or use the contact form. You can also follow ${SITE.handle} on LinkedIn, Facebook, Instagram, X, YouTube and TikTok.` },
 ];
 
 export default function HomePage() {
