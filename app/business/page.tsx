@@ -92,7 +92,7 @@ export default function BusinessPage() {
         <div className="wrap">
           <p className="eyebrow">Leadership roles</p>
           <h2 className="h2">A working <span className="hl">Group CFO</span></h2>
-          <div className="grid" style={{ marginTop: 40, gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
+          <div className="grid" style={{ marginTop: 40, gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))' }}>
             {ROLES.map((r) => (
               <article key={r.t} className="card card--line exp-card">
                 <p className="p-card__tag" style={{ marginTop: 0 }}>{r.since}</p>

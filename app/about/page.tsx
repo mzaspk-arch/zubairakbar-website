@@ -92,7 +92,7 @@ export default function AboutPage() {
             </div>
             <p>Professional memberships, approvals and diplomas behind the advice.</p>
           </div>
-          <div className="grid" style={{ marginTop: 40, gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 18 }}>
+          <div className="grid" style={{ marginTop: 40, gridTemplateColumns: 'repeat(auto-fill, minmax(min(250px, 100%), 1fr))', gap: 18 }}>
             {CREDS.map((c) => (
               <div key={c.t} className="cred-card">
                 <p className="k">{c.k}</p>

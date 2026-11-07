@@ -4,7 +4,7 @@ import { TOPICS, getAllPosts, type Topic } from '@/lib/blog';
 export default function TopicCards({ current }: { current?: Topic }) {
   const posts = getAllPosts();
   return (
-    <div className="grid" style={{ marginTop: 40, gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
+    <div className="grid" style={{ marginTop: 40, gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))' }}>
       {(Object.keys(TOPICS) as Topic[]).filter((t) => t !== current).map((t) => {
         const n = posts.filter((p) => p.topic === t).length;
         return (

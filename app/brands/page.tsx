@@ -65,7 +65,7 @@ export default function BrandsPage() {
         <div className="wrap split">
           <div className="split__text">
             <p className="hero__label">Featured product · WhatsApp CRM · Live</p>
-            <h2 className="h2" style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+            <h2 className="h2" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 18 }}>
               <span className="logo-tile" style={{ width: 64, height: 64 }}>
                 <img src="/images/logos/whatsell.webp" alt="" width={46} height={46} />
               </span>
