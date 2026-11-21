@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { NextResponse } from 'next/server';
+import { ownerNotification, visitorConfirmation } from '@/lib/email';
 import { TOPIC_OPTIONS } from '@/lib/site';
 
 export const runtime = 'nodejs';
@@ -18,7 +19,6 @@ function limited(ip: string) {
 
 const clean = (v: unknown, max: number) => String(v ?? '').replace(/\r/g, '').trim().slice(0, max);
 const oneLine = (s: string) => s.replace(/[\n\t]+/g, ' ');
-const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 const fail = (error: string, status = 400) => NextResponse.json({ ok: false, error }, { status });
 
 async function verifyTurnstile(token: string, ip: string) {
@@ -67,21 +67,43 @@ export async function POST(req: Request) {
   const port = Number(SMTP_PORT || 465);
   const transporter = nodemailer.createTransport({ host: SMTP_HOST, port, secure: port === 465, auth: { user: SMTP_USER, pass: SMTP_PASS } });
 
-  const text = `Name: ${name}\nEmail: ${email}\nCompany: ${company || '-'}\nTopic: ${topic}\nIP: ${ip}\n\n${message}`;
-  const html = `<p><b>Name:</b> ${esc(name)}<br><b>Email:</b> ${esc(email)}<br><b>Company:</b> ${esc(company || '-')}<br><b>Topic:</b> ${esc(topic)}</p><p style="white-space:pre-wrap">${esc(message)}</p><p style="color:#888;font-size:12px">Sent from the zubairakbar.com contact form · IP ${esc(ip)}</p>`;
+  const enquiry = { name, email, company, topic, message, ip };
+  const from = CONTACT_FROM || SMTP_USER;
+  const inbox = CONTACT_TO || 'contact@zubairakbar.com';
 
+  // 1. Notification to Zubair (pressing Reply answers the visitor)
   try {
+    const n = ownerNotification(enquiry);
     await transporter.sendMail({
-      from: `"zubairakbar.com" <${CONTACT_FROM || SMTP_USER}>`,
-      to: CONTACT_TO || 'contact@zubairakbar.com',
+      from: { name: 'zubairakbar.com', address: from },
+      to: inbox,
       replyTo: { name, address: email },
-      subject: `Website enquiry: ${topic} — ${name}`,
-      text,
-      html,
+      subject: n.subject,
+      text: n.text,
+      html: n.html,
     });
   } catch (err) {
     console.error('[contact] send failed', err);
     return fail('The message could not be sent. Please email contact@zubairakbar.com.', 502);
+  }
+
+  // 2. Branded confirmation to the visitor (switch off with CONTACT_AUTOREPLY=0).
+  //    A failure here never blocks the enquiry, which has already been delivered.
+  if (process.env.CONTACT_AUTOREPLY !== '0') {
+    try {
+      const c = visitorConfirmation(enquiry);
+      await transporter.sendMail({
+        from: { name: 'Zubair Akbar', address: from },
+        to: { name, address: email },
+        replyTo: { name: 'Zubair Akbar', address: inbox },
+        subject: c.subject,
+        text: c.text,
+        html: c.html,
+        headers: { 'Auto-Submitted': 'auto-replied', 'X-Auto-Response-Suppress': 'All' },
+      });
+    } catch (err) {
+      console.error('[contact] confirmation email failed', err);
+    }
   }
   return NextResponse.json({ ok: true });
 }
