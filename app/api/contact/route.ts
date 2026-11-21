@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import { NextResponse } from 'next/server';
-import { ownerNotification, visitorConfirmation } from '@/lib/email';
+import path from 'node:path';
+import { inlineImages, ownerNotification, visitorConfirmation } from '@/lib/email';
 import { TOPIC_OPTIONS } from '@/lib/site';
 
 export const runtime = 'nodejs';
@@ -68,6 +69,7 @@ export async function POST(req: Request) {
   const transporter = nodemailer.createTransport({ host: SMTP_HOST, port, secure: port === 465, auth: { user: SMTP_USER, pass: SMTP_PASS } });
 
   const enquiry = { name, email, company, topic, message, ip };
+  const imgDir = path.join(process.cwd(), 'public', 'email');
   const from = CONTACT_FROM || SMTP_USER;
   const inbox = CONTACT_TO || 'contact@zubairakbar.com';
 
@@ -81,6 +83,7 @@ export async function POST(req: Request) {
       subject: n.subject,
       text: n.text,
       html: n.html,
+      attachments: inlineImages(imgDir, { photo: false }),
     });
   } catch (err) {
     console.error('[contact] send failed', err);
@@ -99,6 +102,7 @@ export async function POST(req: Request) {
         subject: c.subject,
         text: c.text,
         html: c.html,
+        attachments: inlineImages(imgDir),
         headers: { 'Auto-Submitted': 'auto-replied', 'X-Auto-Response-Suppress': 'All' },
       });
     } catch (err) {

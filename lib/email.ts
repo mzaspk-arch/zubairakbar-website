@@ -5,7 +5,19 @@
  */
 import { SITE, SOCIAL } from './site';
 
-const IMG = `${SITE.url}/email`;
+/** Images are attached inside the email (cid:) so Outlook shows them without asking to "download pictures" */
+const EMBED = ['logo', 'zubair-akbar-128', ...SOCIAL.map((s) => s.key), 'whatsapp'] as const;
+const img = (name: string) => `cid:${name}@zubairakbar.com`;
+
+/** Inline attachments for nodemailer: every image the layout uses */
+export function inlineImages(dir: string, { photo = true } = {}) {
+  return [...new Set(EMBED)].filter((n) => photo || n !== 'zubair-akbar-128').map((name) => ({
+    filename: `${name}.png`,
+    path: `${dir}/${name}.png`,
+    cid: `${name}@zubairakbar.com`,
+    contentDisposition: 'inline' as const,
+  }));
+}
 const C = { ink: '#151515', muted: '#5C5C5C', grey: '#8C8C8C', line: '#D0D0D0', bg: '#F2F2F2', slate: '#5A7EA8', steel: '#3F5F86' };
 const FONT = "Arial, Helvetica, sans-serif";
 const HEAD = "Montserrat, Arial, Helvetica, sans-serif";
@@ -19,9 +31,9 @@ export const stripLinks = (s: string) => s.replace(/\b(?:https?:\/\/|www\.)\S+/g
 const socialRow = () =>
   SOCIAL.map(
     (s) =>
-      `<td style="padding:0 6px 0 0;"><a href="${s.href}" style="text-decoration:none;"><img src="${IMG}/${s.key}.png" width="28" height="28" alt="${s.label}" style="display:block;border:0;"></a></td>`,
+      `<td style="padding:0 6px 0 0;"><a href="${s.href}" style="text-decoration:none;"><img src="${img(s.key)}" width="28" height="28" alt="${s.label}" style="display:block;border:0;"></a></td>`,
   ).join('') +
-  `<td style="padding:0;"><a href="https://wa.me/971507821371" style="text-decoration:none;"><img src="${IMG}/whatsapp.png" width="28" height="28" alt="WhatsApp" style="display:block;border:0;"></a></td>`;
+  `<td style="padding:0;"><a href="https://wa.me/971507821371" style="text-decoration:none;"><img src="${img('whatsapp')}" width="28" height="28" alt="WhatsApp" style="display:block;border:0;"></a></td>`;
 
 /** Wraps content in the branded layout: logo header, white card, signature block, social icons, footer */
 export function layout({ preheader, body, signature = true }: { preheader: string; body: string; signature?: boolean }) {
@@ -33,7 +45,7 @@ export function layout({ preheader, body, signature = true }: { preheader: strin
     <tr><td style="padding:24px 0 0 0;">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
         <tr>
-          <td valign="middle" style="padding:0 16px 0 0;"><img src="${IMG}/zubair-akbar.png" width="64" height="64" alt="Zubair Akbar" style="display:block;border:0;width:64px;height:64px;"></td>
+          <td valign="middle" style="padding:0 16px 0 0;"><img src="${img('zubair-akbar-128')}" width="64" height="64" alt="Zubair Akbar" style="display:block;border:0;width:64px;height:64px;"></td>
           <td valign="middle" style="border-left:3px solid ${C.slate};padding:0 0 0 14px;font-family:${FONT};">
             <div style="font-family:${HEAD};font-size:16px;font-weight:bold;color:${C.ink};letter-spacing:.5px;">ZUBAIR AKBAR</div>
             <div style="font-size:13px;font-weight:bold;color:${C.steel};line-height:19px;">Finance, Tax &amp; Technology Entrepreneur</div>
@@ -54,7 +66,7 @@ export function layout({ preheader, body, signature = true }: { preheader: strin
 <tr><td align="center" style="padding:32px 12px;">
   <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;width:100%;max-width:600px;background:#FFFFFF;border-top:6px solid ${C.slate};">
     <tr><td style="padding:32px 40px 8px 40px;">
-      <a href="${SITE.url}" style="text-decoration:none;"><img src="${IMG}/logo.png" width="129" height="44" alt="Zubair Akbar" style="display:block;border:0;width:129px;height:44px;"></a>
+      <a href="${SITE.url}" style="text-decoration:none;"><img src="${img('logo')}" width="129" height="44" alt="Zubair Akbar" style="display:block;border:0;width:129px;height:44px;"></a>
     </td></tr>
     <tr><td style="padding:16px 40px 8px 40px;font-family:${FONT};font-size:15px;line-height:24px;color:${C.ink};">
       ${body}
@@ -83,7 +95,11 @@ const row = (label: string, value: string) =>
   `<tr><td style="padding:8px 12px 8px 0;font-family:${FONT};font-size:13px;color:${C.muted};white-space:nowrap;vertical-align:top;width:90px;">${label}</td><td style="padding:8px 0;font-family:${FONT};font-size:14px;color:${C.ink};vertical-align:top;">${value}</td></tr>`;
 
 const quote = (text: string) =>
-  `<div style="margin:8px 0 0 0;padding:16px 18px;background:${C.bg};border-left:4px solid ${C.slate};font-family:${FONT};font-size:14px;line-height:22px;color:${C.ink};white-space:pre-wrap;">${esc(text)}</div>`;
+  `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;margin:8px 0 0 0;"><tr><td bgcolor="${C.bg}" style="padding:16px 18px;background:${C.bg};border-left:4px solid ${C.slate};font-family:${FONT};font-size:14px;line-height:22px;color:${C.ink};">${esc(text).replace(/\n/g, '<br>')}</td></tr></table>`;
+
+/** Button that renders the same in Outlook (padding and colour live on the table cell) */
+const button = (href: string, label: string) =>
+  `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr><td bgcolor="${C.ink}" style="background:${C.ink};border-radius:6px;padding:12px 22px;"><a href="${href}" style="color:#FFFFFF;font-family:${FONT};font-size:14px;font-weight:bold;text-decoration:none;display:inline-block;">${label}</a></td></tr></table>`;
 
 export type Enquiry = { name: string; email: string; company: string; topic: string; message: string; ip: string };
 
@@ -134,10 +150,7 @@ export function ownerNotification(e: Enquiry) {
 </table>
 <p style="margin:20px 0 0 0;font-family:${FONT};font-size:12px;letter-spacing:1px;color:${C.muted};">MESSAGE</p>
 ${quote(e.message)}
-<p style="margin:24px 0 0 0;">
-  <a href="mailto:${esc(e.email)}?subject=${encodeURIComponent('Re: ' + e.topic)}" style="display:inline-block;padding:12px 22px;background:${C.ink};color:#FFFFFF;font-family:${FONT};font-size:14px;font-weight:bold;text-decoration:none;border-radius:6px;">Reply to ${esc(e.name.split(' ')[0] || e.name)}</a>
-</p>
-<p style="margin:20px 0 0 0;font-size:12px;color:${C.grey};">Pressing Reply in your email app also answers ${esc(e.email)} directly. An automatic confirmation has been sent to them. Sender IP: ${esc(e.ip)}</p>`;
+<div style="margin:24px 0 0 0;">${button(`mailto:${esc(e.email)}?subject=${encodeURIComponent('Re: ' + e.topic)}`, `Reply to ${esc(e.name.split(' ')[0] || e.name)}`)}</div><p style="margin:20px 0 0 0;font-size:12px;color:${C.grey};">Pressing Reply in your email app also answers ${esc(e.email)} directly. An automatic confirmation has been sent to them. Sender IP: ${esc(e.ip)}</p>`;
   const text = `New website enquiry\n\nName: ${e.name}\nEmail: ${e.email}\nCompany: ${e.company || '-'}\nTopic: ${e.topic}\nIP: ${e.ip}\n\n${e.message}`;
   return { subject, html: layout({ preheader: `${e.name}: ${e.message.slice(0, 90)}`, body, signature: false }), text };
 }
